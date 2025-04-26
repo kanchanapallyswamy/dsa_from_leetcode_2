@@ -24,9 +24,7 @@ class Solution {
             char ch2 = s.charAt(i+1);
             int val = ch2-'0';
             ans += ch1;
-            Map<Integer, Character> innerMap = new HashMap<>(mp.get(ch1));
-            System.out.println(innerMap.size());
-            ans += innerMap.get(val);
+            ans +=  mp.get(ch1).get(val);
             i++;
         }
         if(s.length()%2==1)ans += s.charAt(s.length()-1);

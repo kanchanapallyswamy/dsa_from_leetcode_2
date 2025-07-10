@@ -32,9 +32,9 @@ class Solution {
             }
             else if(a[l] == '#'){
                if(a[r] == '.'){
-                 char temp = a[r];
+                //  char temp = a[r];
                 a[r]=a[l];
-                a[l] = temp;
+                a[l] = '.';
                }
                r--;
                l--;

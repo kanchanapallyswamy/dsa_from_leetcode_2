@@ -45,12 +45,10 @@ class LRUCache {
         insertAtFront(node);
         return node.value;
     }
-
-    public void put(int key, int value) {
+ public void put(int key, int value) {
         if (cache.containsKey(key)) {
-            Node existingNode = cache.get(key);
-            remove(existingNode);
-            cache.remove(key); // \U0001f527 fix here
+            remove(cache.get(key));
+            cache.remove(key);
         }
 
         if (cache.size() == capacity) {
@@ -59,7 +57,7 @@ class LRUCache {
         }
 
         Node newNode = new Node(key, value);
-        insertAtFront(newNode);
         cache.put(key, newNode);
+        insertAtFront(newNode);
     }
 }

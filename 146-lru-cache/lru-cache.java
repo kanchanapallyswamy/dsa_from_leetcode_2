@@ -12,17 +12,15 @@ class LRUCache {
 
     private final int capacity;
     private final Map<Integer, Node> map;
-    private Node head = null; // Most recently used
-
+    private Node head = null; 
     public LRUCache(int capacity) {
         this.capacity = capacity;
         this.map = new HashMap<>();
     }
 
-    // Remove a node from the circular DLL
     private void remove(Node node) {
         if (node.next == node) {
-            head = null; // Only one node in the list
+            head = null; 
         } else {
             node.prev.next = node.next;
             node.next.prev = node.prev;
@@ -32,7 +30,6 @@ class LRUCache {
         }
     }
 
-    // Insert node at the front (head) of the circular DLL
     private void insertAtFront(Node node) {
         if (head == null) {
             node.next = node;
@@ -55,7 +52,7 @@ class LRUCache {
         Node node = map.get(key);
         remove(node);
         insertAtFront(node);
-        map.put(key, head); // Update the head in the map
+        map.put(key, head); 
         return node.value;
     }
 
@@ -67,7 +64,7 @@ class LRUCache {
         }
 
         if (map.size() == capacity) {
-            Node lru = head.prev; // Least recently used = tail
+            Node lru = head.prev; 
             remove(lru);
             map.remove(lru.key);
         }

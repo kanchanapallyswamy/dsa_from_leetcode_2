@@ -1,60 +1,79 @@
+
 class LRUCache {
-    class Node{
-        int key , value;
-        Node next , prev;
-        public Node(int key , int value){
-            this.key = key;
-            this.value = value;
+    class Node {
+        int key, value;
+        Node prev, next;
+
+        Node(int k, int v) {
+            key = k;
+            value = v;
         }
     }
-    Map<Integer , Node> mp;
-    Node head , tail;
-    int capacity;
+
+    private final int capacity;
+    private final Map<Integer, Node> map;
+    private Node head = null; // Most recently used
+
     public LRUCache(int capacity) {
-    this.capacity = capacity;
-    mp = new HashMap<>();
-    this.head = new Node(0 , 0);
-    this.tail = new Node(0 , 0);
-    head.next = tail;
-    tail.prev = head;
+        this.capacity = capacity;
+        this.map = new HashMap<>();
     }
-    public void addAtHead(Node node){
-        Node nodeAfterHead = head.next;
-        node.next = nodeAfterHead;
-        node.prev = head;
-        nodeAfterHead.prev = node;
-        head.next = node;
+
+    // Remove a node from the circular DLL
+    private void remove(Node node) {
+        if (node.next == node) {
+            head = null; // Only one node in the list
+        } else {
+            node.prev.next = node.next;
+            node.next.prev = node.prev;
+            if (node == head) {
+                head = head.next;
+            }
+        }
     }
-    public void remove(Node node){
-        node.prev.next = node.next;
-        node.next.prev = node.prev;
+
+    // Insert node at the front (head) of the circular DLL
+    private void insertAtFront(Node node) {
+        if (head == null) {
+            node.next = node;
+            node.prev = node;
+            head = node;
+        } else {
+            Node tail = head.prev;
+            node.next = head;
+            node.prev = tail;
+            tail.next = node;
+            head.prev = node;
+            head = node;
+        }
     }
+
     public int get(int key) {
-        if(!mp.containsKey(key)) return -1;
-        Node nn = mp.get(key);
-        remove(nn);
-        addAtHead(nn);
-        return nn.value;
+        if (!map.containsKey(key))
+            return -1;
+
+        Node node = map.get(key);
+        remove(node);
+        insertAtFront(node);
+        map.put(key, head); // Update the head in the map
+        return node.value;
     }
-    
+
     public void put(int key, int value) {
-        if(mp.containsKey(key)){
-            remove(mp.get(key));
-            mp.remove(key);
+        if (map.containsKey(key)) {
+            Node existing = map.get(key);
+            remove(existing);
+            map.remove(key);
         }
-        if(mp.size() == capacity){
-            mp.remove(tail.prev.key);
-            remove(tail.prev);
+
+        if (map.size() == capacity) {
+            Node lru = head.prev; // Least recently used = tail
+            remove(lru);
+            map.remove(lru.key);
         }
-        Node nn = new Node(key , value);
-        addAtHead(nn);
-        mp.put(key , nn);
+
+        Node newNode = new Node(key, value);
+        insertAtFront(newNode);
+        map.put(key, newNode);
     }
 }
-
-/**
- * Your LRUCache object will be instantiated and called as such:
- * LRUCache obj = new LRUCache(capacity);
- * int param_1 = obj.get(key);
- * obj.put(key,value);
- */

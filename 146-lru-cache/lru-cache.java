@@ -1,63 +1,60 @@
-import java.util.*;
-
 class LRUCache {
-    class Node {
-        int key, value;
-        Node prev, next;
-
-        Node(int k, int v) {
-            key = k;
-            value = v;
+    class Node{
+        int key , value;
+        Node next , prev;
+        public Node(int key , int value){
+            this.key = key;
+            this.value = value;
         }
     }
-
-    private final int capacity;
-    private final Map<Integer, Node> cache;
-    private final Node head, tail;
-
+    Map<Integer , Node> mp;
+    Node head , tail;
+    int capacity;
     public LRUCache(int capacity) {
-        this.capacity = capacity;
-        cache = new HashMap<>();
-        head = new Node(0, 0);
-        tail = new Node(0, 0);
-        head.next = tail;
-        tail.prev = head;
+    this.capacity = capacity;
+    mp = new HashMap<>();
+    this.head = new Node(0 , 0);
+    this.tail = new Node(0 , 0);
+    head.next = tail;
+    tail.prev = head;
     }
-
-    private void remove(Node node) {
+    public void addAtHead(Node node){
+        Node nodeAfterHead = head.next;
+        node.next = nodeAfterHead;
+        node.prev = head;
+        nodeAfterHead.prev = node;
+        head.next = node;
+    }
+    public void remove(Node node){
         node.prev.next = node.next;
         node.next.prev = node.prev;
     }
-
-    private void insertAtFront(Node node) {
-        node.next = head.next;
-        node.prev = head;
-        head.next.prev = node;
-        head.next = node;
-    }
-
     public int get(int key) {
-        if (!cache.containsKey(key))
-            return -1;
-
-        Node node = cache.get(key);
-        remove(node);
-        insertAtFront(node);
-        return node.value;
+        if(!mp.containsKey(key)) return -1;
+        Node nn = mp.get(key);
+        remove(nn);
+        addAtHead(nn);
+        return nn.value;
     }
- public void put(int key, int value) {
-        if (cache.containsKey(key)) {
-            remove(cache.get(key));
-            cache.remove(key);
+    
+    public void put(int key, int value) {
+        if(mp.containsKey(key)){
+            remove(mp.get(key));
+            mp.remove(key);
         }
-
-        if (cache.size() == capacity) {
-            cache.remove(tail.prev.key);
+        if(mp.size() == capacity){
+            mp.remove(tail.prev.key);
             remove(tail.prev);
         }
-
-        Node newNode = new Node(key, value);
-        cache.put(key, newNode);
-        insertAtFront(newNode);
+        Node nn = new Node(key , value);
+        addAtHead(nn);
+        mp.put(key , nn);
     }
 }
+
+/**
+ * Your LRUCache object will be instantiated and called as such:
+ * LRUCache obj = new LRUCache(capacity);
+ * int param_1 = obj.get(key);
+ * obj.put(key,value);
+ */

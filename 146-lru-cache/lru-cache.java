@@ -1,3 +1,4 @@
+import java.util.*;
 
 class LRUCache {
     class Node {
@@ -11,66 +12,60 @@ class LRUCache {
     }
 
     private final int capacity;
-    private final Map<Integer, Node> map;
-    private Node head = null; 
+    private final Map<Integer, Node> cache;
+    private final Node head, tail;
+
     public LRUCache(int capacity) {
         this.capacity = capacity;
-        this.map = new HashMap<>();
+        cache = new HashMap<>();
+        head = new Node(0, 0);
+        tail = new Node(0, 0);
+        head.next = tail;
+        tail.prev = head;
     }
 
     private void remove(Node node) {
-        if (node.next == node) {
-            head = null; 
-        } else {
-            node.prev.next = node.next;
-            node.next.prev = node.prev;
-            if (node == head) {
-                head = head.next;
-            }
-        }
+        node.prev.next = node.next;
+        node.next.prev = node.prev;
     }
 
     private void insertAtFront(Node node) {
-        if (head == null) {
-            node.next = node;
-            node.prev = node;
-            head = node;
-        } else {
-            Node tail = head.prev;
-            node.next = head;
-            node.prev = tail;
-            tail.next = node;
-            head.prev = node;
-            head = node;
-        }
+        
+        Node nextt = head.next;
+        nextt.prev = node;
+        node.next = nextt;
+        head.next = node;
+        node.prev = head;
+        // node.next = head.next;
+        // node.prev = head;
+        // head.next.prev = node;
+        // head.next = node;
     }
 
     public int get(int key) {
-        if (!map.containsKey(key))
+        if (!cache.containsKey(key))
             return -1;
 
-        Node node = map.get(key);
+        Node node = cache.get(key);
         remove(node);
         insertAtFront(node);
-        map.put(key, head); 
         return node.value;
     }
 
     public void put(int key, int value) {
-        if (map.containsKey(key)) {
-            Node existing = map.get(key);
-            remove(existing);
-            map.remove(key);
+        if (cache.containsKey(key)) {
+            Node existingNode = cache.get(key);
+            remove(existingNode);
+            cache.remove(key); // \U0001f527 fix here
         }
 
-        if (map.size() == capacity) {
-            Node lru = head.prev; 
-            remove(lru);
-            map.remove(lru.key);
+        if (cache.size() == capacity) {
+            cache.remove(tail.prev.key);
+            remove(tail.prev);
         }
 
         Node newNode = new Node(key, value);
         insertAtFront(newNode);
-        map.put(key, newNode);
+        cache.put(key, newNode);
     }
 }

@@ -56,10 +56,11 @@ class LRUCache {
         if (cache.containsKey(key)) {
             Node existingNode = cache.get(key);
             remove(existingNode);
-            cache.remove(key); // \U0001f527 fix here
+            //cache.remove(key); // \U0001f527 fix here
+
         }
 
-        if (cache.size() == capacity) {
+        else if (cache.size() == capacity) {
             cache.remove(tail.prev.key);
             remove(tail.prev);
         }
